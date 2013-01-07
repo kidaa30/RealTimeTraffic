@@ -1,0 +1,92 @@
+@startuml img/intergratedUML.png
+
+
+class RealTimeTrafficTopology {
+	+void main(String[] args)
+}
+
+RealTimeTrafficTopology->FieldListenerSpout:GPSDataLine >
+
+class FieldListenerSpout {
+	~SpoutOutputCollector _collector
+	~Random _rand
+	-String file
+	+void open(Map conf, TopologyContext context, SpoutOutputCollector collector)
+	+void nextTuple()
+	+void ack(Object id)
+	+void fail(Object id)
+	+void declareOutputFields(OutputFieldsDeclarer declarer)
+}
+abstract class BaseRichSpout {
+}
+BaseRichSpout <|-- FieldListenerSpout
+
+FieldListenerSpout->MapMatchingBolt:tuple >
+
+
+
+class MapMatchingBolt {
+	+void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+	+void execute(TupleInfo input)
+	+void cleanup()
+	+void declareOutputFields(OutputFieldsDeclarer declarer)
+	+Map<String,Object> getComponentConfiguration()
+}
+interface IRichBolt {
+}
+IRichBolt <|.. MapMatchingBolt
+
+MapMatchingBolt->SpeedCalculatorBolt: tuple >
+
+
+
+class SpeedCalculatorBolt {
+	~Tuple tuple
+	-OutputCollector collector
+	+void execute()
+	+void declareOutputFields(OutputFieldsDeclarer declarer)
+	+void prepare(Map stormConf, TopologyContext context, OutputCollector collector)
+	+void execute(Tuple input)
+	+void cleanup()
+	+Map<String,Object> getComponentConfiguration()
+}
+interface IRichBolt {
+}
+IRichBolt <|.. SpeedCalculatorBolt
+
+
+
+class tupleInfo {
+	-String viechleID
+	-String dateTime
+	-double lantitude
+	-double longitude
+	-int speed
+	-int melostone
+	-int bearing
+	+Fields getFieldList()
+	+String getDelimiter()
+}
+
+class thresholdInfo {
+	-String action
+	-String rule
+	-Object thresholdValue
+	-int thresholdColNumber
+	-Integer timeWindow
+	-int frequencyOfOccurence
+	+int getThresholdColNumber()
+	+Object getThresholdValue()
+	+int getFrequencyOfOccurence()
+	+String getAction()
+	+Integer getTimeWindow()
+}
+class tupleInfo {
+}
+tupleInfo <|-- thresholdInfo
+interface Serializable {
+}
+Serializable <|.. thresholdInfo
+
+
+@enduml
