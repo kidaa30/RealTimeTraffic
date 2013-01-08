@@ -1,9 +1,11 @@
 package storm.realTraffic.bolt;
 
+
 import java.util.Map;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
+
 
 public class DBWriterBolt implements IRichBolt {
 	

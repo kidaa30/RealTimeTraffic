@@ -1,11 +1,14 @@
-@startuml img/intergratedUML.png
+@startuml intergratedUML.png
 
+ title <size:28>Real Time Traffic Diagram\n <size:18> xdata@SIAT 2013-01-07 
+ 
 
 class RealTimeTrafficTopology {
 	+void main(String[] args)
 }
 
-RealTimeTrafficTopology->FieldListenerSpout:GPSDataLine >
+RealTimeTrafficTopology-->FieldListenerSpout:GPSDataLine >
+
 
 class FieldListenerSpout {
 	~SpoutOutputCollector _collector
@@ -68,6 +71,10 @@ class tupleInfo {
 	+String getDelimiter()
 }
 
+thresholdInfo-->SpeedCalculatorBolt: call 
+thresholdInfo-->MapMatchingBolt: call 
+thresholdInfo-->DBWriterBolt: call 
+
 class thresholdInfo {
 	-String action
 	-String rule
@@ -87,6 +94,19 @@ tupleInfo <|-- thresholdInfo
 interface Serializable {
 }
 Serializable <|.. thresholdInfo
+
+
+class DBWriterBolt {
+	+void prepare(Map StormConf, TopologyContext context)
+	+void execute(Tuple tuple, BasicOutputCollector collector)
+	+void executeBatch()
+}
+interface IRichBolt {
+}
+IRichBolt <|.. DBWriterBolt
+
+SpeedCalculatorBolt->DBWriterBolt: tuple >
+
 
 
 @enduml

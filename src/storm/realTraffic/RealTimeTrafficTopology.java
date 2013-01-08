@@ -1,5 +1,13 @@
 package storm.realTraffic;
 
+/**
+ * Copyright 2013 Xdata@SIAT
+ * 
+ * Last Updated:2013-1-7 ÏÂÎç8:09:20
+ * 
+ * email: gh.chen@siat.ac.cn
+ */
+
 import storm.realTraffic.bolt.SpeedCalculatorBolt;
 //import storm.realTraffic.bolt.TresholdCalculatorBolt;
 import storm.realTraffic.spout.FieldListenerSpout;
@@ -9,23 +17,9 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.generated.AlreadyAliveException;
 import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
-//import backtype.storm.task.ShellBolt;
-//import backtype.storm.task.TopologyContext;
-//import backtype.storm.topology.BasicOutputCollector;
-//import backtype.storm.topology.IRichBolt;
-//import backtype.storm.topology.OutputFieldsDeclarer;
-//import backtype.storm.topology.TopologyBuilder;
-//import backtype.storm.topology.base.BaseBasicBolt;
-//import backtype.storm.tuple.Fields;
-//import backtype.storm.tuple.Tuple;
-//import backtype.storm.tuple.Values;
-//import java.util.HashMap;
-//import java.util.Map;
 
 
-/**
- * This topology demonstrates Storm's stream groupings and multilang capabilities.
- */
+
 public class RealTimeTrafficTopology {
     
     public static void main(String[] args) throws AlreadyAliveException, 

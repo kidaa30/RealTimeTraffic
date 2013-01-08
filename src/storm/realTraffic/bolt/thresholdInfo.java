@@ -1,25 +1,33 @@
 package storm.realTraffic.bolt;
 
 import java.io.Serializable;
-import storm.realTraffic.spout.tupleInfo;
+import storm.realTraffic.spout.TupleInfo;
 
-public class thresholdInfo extends tupleInfo implements Serializable{
-    /**
+public class thresholdInfo extends TupleInfo implements Serializable{
+    
+	/**
 	 * 
 	 */
-	//private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3337988877646687347L;
+
+
+	
 	private String action;
     private String rule;
-    private static Object thresholdValue;
+    private static Integer thresholdValue;
     private static int thresholdColNumber;
     private static Integer timeWindow;
     private int frequencyOfOccurence;
+    
+    public thresholdInfo(){
+    	
+    }
     
 	public static int getThresholdColNumber() {
 		// TODO Auto-generated method stub
 		return thresholdColNumber;
 	}
-	public static Object getThresholdValue() {
+	public static Integer getThresholdValue() {
 		// TODO Auto-generated method stub
 		return thresholdValue;
 	}

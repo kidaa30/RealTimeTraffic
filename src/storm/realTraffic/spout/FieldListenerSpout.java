@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
+import storm.realTraffic.spout.TupleInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,11 +19,13 @@ import java.util.Map;
 import java.util.Random;
 
 public class FieldListenerSpout extends BaseRichSpout {
-    SpoutOutputCollector _collector;
-    Random _rand;   
+    private SpoutOutputCollector _collector;
+    private BufferedReader fileReader;
+    private Random _rand;   
+    private TopologyContext context;
     private String file="/home/ghchen/2013-01-05.1/2013-01-05--11_05_48.txt";
-    //Object tupleInfo;
     
+    private TupleInfo tupleInfo;
     
     
 
@@ -31,21 +34,25 @@ public class FieldListenerSpout extends BaseRichSpout {
         _collector = collector;
         //_rand = new Random();
 	try 
-    	{
-    	BufferedReader fileReader = new BufferedReader(new FileReader(new File(file)));
+    	{	
+		 this.context=context;
+    	 this.fileReader = new BufferedReader(new FileReader(new File(file)));
     	} 
     	catch (FileNotFoundException e) 
     	{
-    	System.exit(1);
+    		throw new RuntimeException ("error reading file ["+file+"]");
+    	    //System.exit(1);
     	}
     }
 
     @Override
     public void nextTuple() {
+    	
    
         Utils.sleep(2000);
-        RandomAccessFile access = null; 
-        String line = null;                  
+       // RandomAccessFile access = null; 
+        String line = null;  
+        BufferedReader access= new BufferedReader(fileReader)
            try 
            { 
                while ((line = access.readLine()) != null)
@@ -53,7 +60,8 @@ public class FieldListenerSpout extends BaseRichSpout {
                    if (line !=null)
                    {
                        String[] fields=null;
-                        //Fields fields;
+                       
+						//Fields fields;
 						//TupleInfo  tupleInfo;
 						if (tupleInfo.getDelimiter().equals("|"))
                            fields = line.split("\\"+tupleInfo.getDelimiter());
