@@ -9,6 +9,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import storm.realTraffic.spout.TupleInfo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,8 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import storm.realTraffic.spout.TupleInfo;
 
 public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
 	Tuple tuple;
@@ -30,10 +29,13 @@ public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
     public void execute() {
      if(tuple!=null)
     {
+    	TupleInfo tupleInfo;
         List<Object> inputTupleList = (List<Object>) tuple.getValues();
         int thresholdColNum = thresholdInfo.getThresholdColNumber();
         Object thresholdValue = thresholdInfo.getThresholdValue();
-        String thresholdDataType =tupleInfo.getFieldList().get(thresholdColNum-1).getColumnType();
+      
+		//String thresholdDataType =tupleInfo.getFieldList().get(thresholdColNum-1).getColumnType();
+        String thresholdDataType =tupleInfo.getFieldList().get(thresholdColNum-1).getClass().toString();
         Integer timeWindow = thresholdInfo.getTimeWindow();
         int frequency = thresholdInfo.getFrequencyOfOccurence();
 

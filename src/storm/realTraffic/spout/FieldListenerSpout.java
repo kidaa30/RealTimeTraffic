@@ -52,7 +52,7 @@ public class FieldListenerSpout extends BaseRichSpout {
         Utils.sleep(2000);
        // RandomAccessFile access = null; 
         String line = null;  
-        BufferedReader access= new BufferedReader(fileReader)
+        BufferedReader access= new BufferedReader(fileReader);
            try 
            { 
                while ((line = access.readLine()) != null)

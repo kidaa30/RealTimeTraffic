@@ -8,6 +8,8 @@ package storm.realTraffic;
  * email: gh.chen@siat.ac.cn
  */
 
+import storm.realTraffic.bolt.DBWriterBolt;
+import storm.realTraffic.bolt.MapMatchingBolt;
 import storm.realTraffic.bolt.SpeedCalculatorBolt;
 //import storm.realTraffic.bolt.TresholdCalculatorBolt;
 import storm.realTraffic.spout.FieldListenerSpout;
@@ -27,14 +29,18 @@ public class RealTimeTrafficTopology {
                                                    InterruptedException 
  {
 	FieldListenerSpout fieldListenerSpout = new FieldListenerSpout();
+	
 	SpeedCalculatorBolt  thresholdBolt = new SpeedCalculatorBolt ();
-        
+	MapMatchingBolt mapMatchingBolt= new MapMatchingBolt();
+	SpeedCalculatorBolt speedCalculatorBolt =new SpeedCalculatorBolt();
+	DBWriterBolt dbWriterBolt = new DBWriterBolt();
+	
         TopologyBuilder builder = new TopologyBuilder();
         
         builder.setSpout("spout", fieldListenerSpout, 2);
-        
-        builder.setBolt("thresholdBolt", thresholdBolt,3).shuffleGrouping("spout");
-        //builder.setBolt("dbWriterBolt",dbWriterBolt,1).shuffleGrouping("thresholdBolt");
+        builder.setBolt("matchingBolt", mapMatchingBolt,3).shuffleGrouping("spout");        
+        builder.setBolt("speedCalBolt", speedCalculatorBolt,3).shuffleGrouping("matchingBolt");
+        builder.setBolt("dbWriterBolt", dbWriterBolt,1).shuffleGrouping("speedCalBolt");
 
 
 	    Config conf = new Config();

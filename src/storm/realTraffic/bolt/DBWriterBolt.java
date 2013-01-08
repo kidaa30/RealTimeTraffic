@@ -1,7 +1,10 @@
 package storm.realTraffic.bolt;
 
 
+//import java.lang.reflect.Field;
 import java.util.Map;
+
+import storm.realTraffic.spout.TupleInfo;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -29,7 +32,7 @@ public class DBWriterBolt implements IRichBolt {
 
 	       StringBuilder createQuery = new StringBuilder(
 	           "CREATE TABLE IF NOT EXISTS "+tableName+"(");
-	       for(Field fields : tupleInfo.getFieldList())
+	       for(Field fields : TupleInfo.getFieldList())
 	       {
 	           if(fields.getColumnType().equalsIgnoreCase("String"))
 	               createQuery.append(fields.getColumnName()+" VARCHAR(500),");
