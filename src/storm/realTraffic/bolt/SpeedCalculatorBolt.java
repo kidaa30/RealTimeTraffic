@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
+	private static final long serialVersionUID = 1L;
+
 	Tuple tuple;
 
 	private OutputCollector collector;
@@ -27,8 +29,11 @@ public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
 
    // @Override
     public void execute() {
-     if(tuple!=null)
-    {
+     
+    	
+    	
+    /*if(tuple!=null)
+     {
     	TupleInfo tupleInfo;
         List<Object> inputTupleList = (List<Object>) tuple.getValues();
         int thresholdColNum = thresholdInfo.getThresholdColNumber();
@@ -154,7 +159,9 @@ public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
           splitAndEmit(null,collector);
      }
 
-    }     
+    }*/  
+     
+     
    }
     
     
@@ -167,13 +174,12 @@ public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
 //	}
 
 
-	@Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(_outFields);
+	public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields ("viechleID", "dateTime", "occupied", "speed", 
+				"bearing", "latitude", "longitude", "roadID"));
     }
 
 
-	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
 		// TODO Auto-generated method stub
@@ -185,21 +191,18 @@ public class SpeedCalculatorBolt implements IRichBolt{ //Serializable {
 	}
 
 
-	@Override
 	public void execute(Tuple input) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	@Override
 	public void cleanup() {
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	@Override
 	public Map<String, Object> getComponentConfiguration() {
 		// TODO Auto-generated method stub
 		return null;

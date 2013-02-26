@@ -1,83 +1,70 @@
 package storm.realTraffic.spout;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+//import java.util.List;
 
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
+//import main.java.realODMatrix.spout.*;
 
-public class TupleInfo {
-	
+
+public class TupleInfo implements Serializable{
+	private static final long serialVersionUID = 8524559685781732841L;
 	private String viechleID;
 	private String dateTime;
+	private Integer occupied;
+	private Integer speed;
+	private Integer bearing;
 	private Double latitude;
 	private Double longitude;
-	private Integer speed;
-	private Double melostone;
-	private Integer bearing;
+
 	private int numMember=7;
-	
-	
-	public TupleInfo(){
-		
+
+
+	public TupleInfo() {
+		 viechleID="";	
+		 dateTime="";
+		 occupied=0;
+		 speed=0;
+		 bearing=0;			 
+		 latitude=0.0;
+		 longitude=0.0;
+
 	}
-	
-	public TupleInfo(List<String> input){
-		int lstLength=input.size();
-		if(numMember!=input.size())
-			System.out.print("input list size mismatch");// ("input list size mismatch");
-		else 
-		{
-			 viechleID=input.get(0);	
-			 dateTime=input.get(1);
-			 latitude=Double.parseDouble(input.get(2));
-			 longitude=Double.parseDouble(input.get(3));
-			 speed=Integer.parseInt(input.get(4));
-			 melostone=Double.parseDouble(input.get(5));
-			 bearing=Integer.parseInt(input.get(6));			
-		}
+
+	public TupleInfo(String[] input) {
+
+			 viechleID=input[0];	
+			 dateTime=input[1];
+			 occupied=Integer.parseInt(input[2]);
+			 speed=Integer.parseInt(input[3]);
+			 bearing=Integer.parseInt(input[4]);			 
+			 latitude=Double.parseDouble(input[5]);
+			 longitude=Double.parseDouble(input[6]);				 
+
 	}
-	
 
 
-/*	public String[] getFieldList() {
-		// TODO Auto-generated method stub
-		//Fields fieldList= new Fields(viechleID,dateTime,latitude,longitude,speed,melostone,bearing);
-		String[] fieldList= new String[numMember];
 
-		
-			
-		fieldList[0]=viechleID;
-		fieldList[1]=dateTime;
-		fieldList[2]=Double.toString(latitude) ;
-		fieldList[3]=Double.toString(longitude) ;
-		fieldList[4]=Integer.toString(speed) ;
-		fieldList[5]=Double.toString(melostone);
-		fieldList[6]=Integer.toString(bearing);
-		
-		return fieldList;
-	}*/
-	
-	
+	public int getTupleLength() {	
+		return numMember;
+	}
+
+
 	public Fields getFieldList() {		
-		//Fields fieldList= new Fields(viechleID,dateTime,latitude,longitude,speed,melostone,bearing);
-		Fields fieldList= new Fields (viechleID,dateTime,Double.toString(latitude),
-				Double.toString(longitude),Integer.toString(speed),Double.toString(melostone),
-				Integer.toString(bearing));		
+		Fields fieldList= new Fields ("viechleID","dateTime","occupied",
+				"speed","bearing","latitude","longitude");		
 		return fieldList;
 	}
 
 
 
 
-	public String getDelimiter() {
+	public static String getDelimiter() {
 		// TODO Auto-generated method stub
-		String delimiter="|";
+		String delimiter=",";
 		return delimiter;
-	
+
 	}
-
-
 }
