@@ -39,15 +39,15 @@ public class MapMatchingBolt implements IRichBolt {
 	//private static final long serialVersionUID = 1L;
 	private OutputCollector _collector;
 
-	Integer districtID ;
+	Integer roadID ;
 	GPSRcrd record;
-	Map<GPSRcrd, Integer> gpsMatch;  //map<GPSRcrd,districtID>
+	Map<GPSRcrd, Integer> gpsMatch;  //map<GPSRcrd,roadID>
 	Integer taskID;
 	String taskname;
 	List<Object> inputLine; 
 	Fields matchBoltDeclare=null;
 
-	static String path = "/home/ghchen/sects/sects.shp";
+	static String path = "/home/ghchen/sects/szRoads/SZRoads.shp";
 	static roadSects sects=null ;	
 	int count=0;
 
@@ -92,19 +92,21 @@ public class MapMatchingBolt implements IRichBolt {
 					) return;
 
 
-			districtID = sects.fetchSect(record);
+			//roadID = sects.fetchSect(record);
+			
+			roadID = sects.fetchRoadID(record);
 
-			if(districtID!=-1)
+			if(roadID!=-1)
 			{
-				System.out.println(count++ +": GPS Point falls into Sect No. :" + districtID);
-				//FieldListenerSpout.writeToFile("/home/ghchen/districtID","DistrictBolt GPS Point falls into Sect No. ::"+districtID.toString());
+				System.out.println(count++ +": GPS Point falls into Sect No. :" + roadID);
+				//FieldListenerSpout.writeToFile("/home/ghchen/roadID","DistrictBolt GPS Point falls into Sect No. ::"+roadID.toString());
 
 
 
-				inputLine.add(Integer.toString(districtID));			
-				//input.getFields().toList().add("districtID");
+				inputLine.add(Integer.toString(roadID));			
+				//input.getFields().toList().add("roadID");
 				List<String> fieldList= input.getFields().toList();
-				fieldList.add("districtID");
+				fieldList.add("roadID");
 				matchBoltDeclare=new Fields(fieldList);
 				//FieldListenerSpout.writeToFile("/home/ghchen/output","matchBoltDeclare="+matchBoltDeclare);		
 
@@ -133,7 +135,7 @@ public class MapMatchingBolt implements IRichBolt {
 	public void cleanup() {
 		// TODO Auto-generated method stub
 
-		System.out.println("-- District Mathchier ["+taskname+"-"+districtID+"] --");
+		System.out.println("-- District Mathchier ["+taskname+"-"+roadID+"] --");
 		for(Map.Entry<GPSRcrd, Integer> entry : gpsMatch.entrySet()){
 		System.out.println(entry.getKey()+": "+entry.getValue());
 		}
@@ -143,7 +145,7 @@ public class MapMatchingBolt implements IRichBolt {
 
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields ("viechleID", "dateTime", "occupied", "speed", 
-				"bearing", "latitude", "longitude", "districtID"));				
+				"bearing", "latitude", "longitude", "roadID"));				
 	}
 
 

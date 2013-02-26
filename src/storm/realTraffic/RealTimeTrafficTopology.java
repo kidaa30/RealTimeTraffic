@@ -46,9 +46,9 @@ public class RealTimeTrafficTopology {
         if(args!=null && args.length > 0) {
             conf.setNumWorkers(15);            
 
-            //LocalCluster  cluster= new LocalCluster();
-            //cluster.submitTopology(args[0], conf, builder.createTopology());
-            StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+            LocalCluster  cluster= new LocalCluster();
+            cluster.submitTopology(args[0], conf, builder.createTopology());
+            //StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
         } 
         else {     
 
