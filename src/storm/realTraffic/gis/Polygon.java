@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 import org.apache.commons.collections.map.StaticBucketMap;
+import org.apache.commons.jxpath.ri.compiler.Constant;
 
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
@@ -159,6 +160,65 @@ public class Polygon {
 				* (y1 - y2));
 		return lineLength;
 	}
-	
+
+
+	public static double DistancePointToLine( double x1,	double y1, double x2, double y2,double x, double y) {//这是点到线的距离
+		
+		
+		if (y1 == y2)// 线段为平行于X轴
+		{
+			if (Math.min(x1, x2) < x && Math.max(x1, x2) > x)// 垂足在线段内
+			{
+				return Math.abs(ComputeD(y1, x, y, x));// 点与该线的距离为TempP与P的的距离
+			} else {
+				return Math.min(ComputeD(y, x, y1, x1), ComputeD(y, x, y2, x2));// 返回到某个端点的距离
+			}
+		}
+		if (x1 == x2)// 线段为平行于Y轴
+		{
+			if (Math.min(y1, y2) < y && Math.max(y1, y2) > y)// 垂足在线段内
+			{
+				return ComputeD(y, x1, y, x);// 点与该线的距离为TempP与P的的距离
+			} else {
+				return Math.min(ComputeD(y, x, y1, x1), ComputeD(y, x, y2, x2));// 返回到某个端点的距离
+			}
+		} else// 该线段不平行于X轴也不平行于Y轴
+		{
+			double k = (y2 - y1) / (x2 - x1); // 线段的斜率
+			double TempX, TempY;
+			TempX = (Math.pow(k, 2.0) * x1 + k * (y - y1) + x)
+					/ (Math.pow(k, 2.0) + 1.0);
+			TempY = k * (TempX - x1) + y1;
+			if (TempX < -180 || TempX > 180 || TempY < -90 || TempY > 90) {
+				return Math.min(ComputeD(y, x, y1, x1), ComputeD(y, x, y2, x2));// 返回到某个端点的距离
+			}
+			double TempDis1 = (ComputeD(TempY, TempX, y1, x1) + ComputeD(TempY,
+					TempX, y2, x2));
+			double TempDis2 = ComputeD(y1, x1, y2, x2);
+			if ((TempDis1 - TempDis2) < 0.001) // 垂足在线内
+			{
+				return (ComputeD(TempY, TempX, y, x));// 点与该线的距离为TempP与P的的距离
+			} else {
+				return Math.min(ComputeD(y, x, y1, x1), ComputeD(y, x, y2, x2));// 返回到某个端点的距离
+			}
+		}
+	}
+
+	public static double ComputeD(double lat_a, double lng_a, double lat_b,
+			double lng_b) {//两点经纬度距离算法
+            int EARTH_RADIUS=6378137;
+
+			double radLat1 = (lat_a * Math.PI / 180.0);
+			double radLat2 = (lat_b * Math.PI / 180.0);
+			double a = radLat1 - radLat2;
+			double b = (lng_a - lng_b) * Math.PI / 180.0;
+			double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)
+			+ Math.cos(radLat1) * Math.cos(radLat2)
+			* Math.pow(Math.sin(b / 2), 2)));
+			s = s * EARTH_RADIUS;
+
+
+			return s;
+			}
 	
 }
