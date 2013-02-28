@@ -48,7 +48,7 @@ public class MapMatchingBolt implements IRichBolt {
 	Fields matchBoltDeclare=null;
 
 	static String path = "/home/ghchen/sects/szRoads/SZRoads.shp";
-	static roadSects sects=null ;	
+	static roadgridList sects=null ;	
 	int count=0;
 
 
@@ -70,7 +70,7 @@ public class MapMatchingBolt implements IRichBolt {
 
 		try {
 			if(sects==null){
-			sects= new roadSects(path);
+			sects= new roadgridList(path);
 			}
 			//System.out.println("District Match input:"+input.toString());
 			//FieldListenerSpout.writeToFile("/home/ghchen/output","District Match input:"+input.toString());
