@@ -84,8 +84,7 @@ public class FieldListenerSpout implements IRichSpout {
                { 
                    if (line !=null)
                    {
-                  	   for (int i=0;i<3;i++) {System.out.println("\n");}
-							String[] GPSRecord =line.split(tupleInfo.getDelimiter());
+                  	   String[] GPSRecord =line.split(tupleInfo.getDelimiter());
 						     //       line.split("\\"+tupleInfo.getDelimiter());							
 
                         if (tupleInfo.getFieldList().size() == GPSRecord.length)

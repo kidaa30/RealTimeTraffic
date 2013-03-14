@@ -81,7 +81,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		}
 		public String roadId;
 		public int count;//计算次数，是车牌号的个数码
-		//public Date dateTime; //该小区统计的车辆出现时间
+		//public Date dateTime; //该路线统计的车辆出现时间
 		ArrayList<Integer> roadSpd;
 		int avgSpd;
 		//public HashMap<String,spdList> roadSpd; //存放车辆Id的集合,也要把时间存者，以对每一辆车进行计算时间距离
@@ -172,7 +172,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		}
 
 		if (!isDisExits(Roads, RoadID)) {
-			 //没有此小区，则新建一个路径，并存起来				
+			 //没有此路线，则新建一个路径，并存起来				
 			//System.out.println("RoadID:"+RoadID+"dateTime:"+dateTime+"viechId"+viechId);
 			ArrayList<Integer> roadSpd = new ArrayList<Integer>() ; 
 			roadSpd.add(speed);
@@ -186,7 +186,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 			Roads.add(road);  //添加路线
 			return ;
 
-		}else{   //如果已经有该小区
+		}else{   //如果已经有该路线
 			Road road=getRoadById(RoadID);
 			//if(!Road.roadSpd.contains(viechId)){  //但是如果车辆ID是第一次进入该区域，新建一个车辆ID，并保存；
 
@@ -246,7 +246,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		SimpleDateFormat sdf3= new SimpleDateFormat("yyyy-MM-dd");
 		int min=nowDate.getMinutes();
 		int second=nowDate.getSeconds();
-		if( (min%5) ==0 && (second==0) ){
+		if( (min%2) ==0 && (second==0) ){
 			String nowTime=sdf2.format(nowDate);
 
 
@@ -254,7 +254,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 			Roads.clear();
 
 			 String cur_dir=System.getProperty("user.dir");
-			 cur_dir=cur_dir+"/"+sdf3.format(nowDate);
+			 cur_dir=cur_dir+"/real-traffic/"+sdf3.format(nowDate);
 			 newFolder(cur_dir);
 
 			 cur_dir=cur_dir+"/"+"vehicleList-"+nowTime;

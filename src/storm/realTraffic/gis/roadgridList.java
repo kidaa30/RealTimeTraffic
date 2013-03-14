@@ -292,7 +292,7 @@ public class roadgridList {
 				continue;  //不在GPS点所在的九个格子里
 			}*/
 			if (!mapID.equals(s) ){
-				continue;  //不在GPS点所在的九个格子里
+				continue;  //不在GPS点所在的格子里
 			}
 			else {  //在相邻的九个格子内
 				for (SimpleFeature feature: grid.getValue()) {
@@ -323,9 +323,11 @@ public class roadgridList {
 			}
 		}
 		//System.out.println("#  ---- ---    count="+count);
-		System.out.print("The minimum distance="+minD+"\t");
-		if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) ))   //sqrt(2) * width
+		
+		if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) )) {  //sqrt(2) * width
+			System.out.print("\nThe minimum distance="+minD+"\t");
 			return roadID;
+		}
 		else 
 			return -1;
 	}

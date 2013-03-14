@@ -38,9 +38,9 @@ public class RealTimeTrafficTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("spout", fieldListenerSpout,1);	        
-        builder.setBolt("matchingBolt", districtMacthingBolt,8).shuffleGrouping("spout");	        
+        builder.setBolt("matchingBolt", districtMacthingBolt,2).shuffleGrouping("spout");	        
        // builder.setBolt("countBolt",countBolt,6).shuffleGrouping("matchingBolt"); 
-        builder.setBolt("countBolt",spdBolt,6).fieldsGrouping("matchingBolt",new Fields("roadID")); 
+        builder.setBolt("countBolt",spdBolt,2).fieldsGrouping("matchingBolt",new Fields("roadID")); 
        //builder.setBolt("dbBolt",dbWriterBolt,2).shuffleGrouping("countBolt");
 	    Config conf = new Config();
         if(args!=null && args.length > 0) {
