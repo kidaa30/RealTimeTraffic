@@ -55,7 +55,8 @@ public class FieldListenerSpout implements IRichSpout {
 		 String file=new String();
 			 if(file.equals(""))
 			 {
-				file="/home/ghchen/GPS_2011_09_27.txt";
+				file="/home/hadoop/ghchen/GPS_2011_09_27.txt";
+				 //file="D:\\siat-code\\GPS_2011_09_27-5000line.txt";
 			 }
 			 
 		try 

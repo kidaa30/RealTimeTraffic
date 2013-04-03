@@ -49,7 +49,7 @@ public class MapMatchingBolt implements IRichBolt {
 
 	static String path = "/home/ghchen/sects/szRoads/SZRoads.shp";
 	static roadgridList sects=null ;	
-	int count=0;
+	static int count=0;
 
 
 
@@ -98,7 +98,7 @@ public class MapMatchingBolt implements IRichBolt {
 
 			if(roadID!=-1)
 			{
-				System.out.println(count++ +": GPS Point falls into Sect No. :" + roadID);
+				System.out.print("[count:"+count++ +"]: GPS Point falls into Road No. :" + roadID);
 				//FieldListenerSpout.writeToFile("/home/ghchen/roadID","DistrictBolt GPS Point falls into Sect No. ::"+roadID.toString());
 
 

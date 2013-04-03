@@ -38,22 +38,22 @@ public class RealTimeTrafficTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("spout", fieldListenerSpout,1);	        
-        builder.setBolt("matchingBolt", districtMacthingBolt,2).shuffleGrouping("spout");	        
+        builder.setBolt("matchingBolt", districtMacthingBolt,54).shuffleGrouping("spout");	        
        // builder.setBolt("countBolt",countBolt,6).shuffleGrouping("matchingBolt"); 
-        builder.setBolt("countBolt",spdBolt,2).fieldsGrouping("matchingBolt",new Fields("roadID")); 
+        builder.setBolt("countBolt",spdBolt,4).fieldsGrouping("matchingBolt",new Fields("roadID")); 
        //builder.setBolt("dbBolt",dbWriterBolt,2).shuffleGrouping("countBolt");
 	    Config conf = new Config();
         if(args!=null && args.length > 0) {
-            conf.setNumWorkers(15);            
+            conf.setNumWorkers(60);            
 
-            LocalCluster  cluster= new LocalCluster();
-            cluster.submitTopology(args[0], conf, builder.createTopology());
-            //StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+            //LocalCluster  cluster= new LocalCluster();
+            //cluster.submitTopology(args[0], conf, builder.createTopology());
+            StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
         } 
         else {     
 
               conf.setDebug(true);
-              conf.setMaxTaskParallelism(3);
+              conf.setMaxTaskParallelism(60);
               LocalCluster cluster = new LocalCluster();
               cluster.submitTopology(
               "Threshold_Test", conf, builder.createTopology());

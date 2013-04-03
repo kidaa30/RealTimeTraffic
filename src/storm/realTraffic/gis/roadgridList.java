@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +23,8 @@ import org.geotools.xml.xsi.XSISimpleTypes.Int;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.postgis.MultiLineString;
+
+import storm.realTraffic.bolt.MapMatchingBolt;
 
 import backtype.storm.tuple.Values;
 
@@ -272,7 +276,7 @@ public class roadgridList {
 		}
 		return sectID;
 	}*/
-
+	static int count=0;
 	public int fetchRoadID(Point p) throws Exception{
 		int roadID = -1;
 
@@ -281,6 +285,7 @@ public class roadgridList {
 		String mapID= mapID_lan.toString()+"_" +mapID_lon.toString();
 		double minD=Double.MAX_VALUE;
 		int width=0;
+		DecimalFormat df = new DecimalFormat("#.0000");
 
 		for (Map.Entry<String, RoadList> grid : this.gridList.entrySet()) {			
 
@@ -292,13 +297,14 @@ public class roadgridList {
 				continue;  //不在GPS点所在的九个格子里
 			}*/
 			if (!mapID.equals(s) ){
-				continue;  //不在GPS点所在的格子里
+				continue;  //不在GPS点所在的格子里,跳出，到下一个格子
 			}
-			else {  //在相邻的九个格子内
+			else {  //在格子内
 				for (SimpleFeature feature: grid.getValue()) {
 					//SimpleFeature feature=road.getValue();
 
 					int  returnRoadID = Integer.parseInt(feature.getAttribute("ID").toString());
+					
 					width=Integer.parseInt(feature.getAttribute("WIDTH").toString());
 					if(width<=0)width=10;
 					String geoStr=feature.getDefaultGeometry().toString();	
@@ -322,10 +328,16 @@ public class roadgridList {
 				}
 			}
 		}
-		//System.out.println("#  ---- ---    count="+count);
-		
+
+		//String mD=df.format(minD);
+		 NumberFormat ddf1=NumberFormat.getNumberInstance();		    
+		 ddf1.setMaximumFractionDigits(3);
+		 ddf1.setMaximumIntegerDigits(5);
+		 String mD= ddf1.format(minD) ;
+		if(mD.length()>=5) mD=mD.substring(0, 5);
+		System.out.print(/*"\n[count:"+count+*/"\nThe minimum distance="+mD+"\t");
 		if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) )) {  //sqrt(2) * width
-			System.out.print("\nThe minimum distance="+minD+"\t");
+			
 			return roadID;
 		}
 		else 

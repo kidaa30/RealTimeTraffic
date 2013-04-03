@@ -3,7 +3,7 @@
 	<classpathentry kind="src" output="target/classes" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/storm-0.9.0-wip7.jar"/>
+	<classpathentry kind="lib" path="lib/storm-0.9.0-wip7.jar" sourcepath="D:/siat-code/lib/storm-src-0.9.0.zip"/>
 	<classpathentry kind="lib" path="D:/siat-code/realODMatrix/lib/geotools-8.5/batik-transcoder-1.7.jar"/>
 	<classpathentry kind="lib" path="D:/siat-code/realODMatrix/lib/geotools-8.5/common-2.6.0.jar"/>
 	<classpathentry kind="lib" path="D:/siat-code/realODMatrix/lib/geotools-8.5/commons-beanutils-1.7.0.jar"/>

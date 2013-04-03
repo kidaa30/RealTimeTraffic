@@ -97,40 +97,6 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		return null;
 	}
 
-	/*public  String getlngLatByViecheId(String RoadId,String viechId){
-		for(Road d : Roads){
-			if(d.RoadId.equals(RoadId)){
-				return  d.vieLngLatIDList.get(viechId);
-			}
-		}
-		return null;
-	}
-
-	public  void setlngLatByViecheId(String RoadId,String viechId,String lngLat){
-		for(Road d : Roads){
-			if(d.RoadId.equals(RoadId)){
-			   d.vieLngLatIDList.put(viechId, lngLat);
-			}
-		}
-	}
-
-	public  Date getDateByViecheId(String RoadId,String viechId){
-		for(Road d : Roads){
-			if(d.RoadId.equals(RoadId)){
-				return  d.RoadSpd.get(viechId);
-			}
-		}
-		return null;
-	}
-
-	public  void setDateByViecheId(String RoadId,String viechId,Date dateTime){
-		for(Road d : Roads){
-			if(d.RoadId.equals(RoadId)){
-			   d.RoadSpd.put(viechId, dateTime);
-			}
-		}
-	}*/
-
 
     public  Boolean isDisExits(List<Road>  Roads,  String RoadId){
     	for(Road d : Roads){
@@ -156,6 +122,17 @@ public class SpeedCalculatorBolt implements IRichBolt {
 	@SuppressWarnings("null")
 	@Override
 	public void execute(Tuple input) {
+		int count=0;
+		 BufferedWriter br;
+		try {
+			br = new BufferedWriter(new FileWriter("sucess",true));
+			 br.write(++count +"\n");
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		//System.out.println("SpeedCalBolt: "+input.getValues().toString());
 
 		String RoadID = input.getValues().get(7).toString();
 		double lan = Double.parseDouble(input.getValues().get(5).toString());// lan
@@ -194,50 +171,30 @@ public class SpeedCalculatorBolt implements IRichBolt {
 			int sum=0;
 			double avg=-1;
 
-			if(road.roadSpd.size()>=8){
+			if(road.roadSpd.size()>=3){
 				for(int i=0;i<road.roadSpd.size();i++){
 					sum=sum+road.roadSpd.get(i);				 
 				} 
 				avg=(double)sum/road.roadSpd.size();
 
-				double temp=0;
-				for(int i=0;i<road.roadSpd.size();i++)
-				{
-					temp+=Math.pow((road.roadSpd.get(i)-avg), 2);
-				}
-				temp = temp/(road.roadSpd.size()-1);
-				double standdev =  Math.sqrt(temp);
-				if(  Math.abs(speed-avg) <=2* standdev  )
-				{
+//				double temp=0;
+//				for(int i=0;i<road.roadSpd.size();i++)
+//				{
+//					temp+=Math.pow((road.roadSpd.get(i)-avg), 2);
+//				}
+//				temp = temp/(road.roadSpd.size()-1);
+//				double standdev =  Math.sqrt(temp);
+//				if(  Math.abs(speed-avg) <=2* standdev  )
+//				{
 					road.count++;
 					road.roadSpd.add(speed);	
 					road.avgSpd=(int) avg;
-				}
+					System.out.println(road.count+":"+road.avgSpd);
+//				}
 
 			}
-				
-								
-			/*}else{ //否则，这辆车是多次出现在该区域，则判断这个车辆ID 和上一次出现的时间间隔和距离
-				String lngLat = getlngLatByViecheId(RoadID,viechId);
-				String[]  s = lngLat.split("_");
-				lonLast = Double.parseDouble(s[0]);
-				lanLast = Double.parseDouble(s[1]);
-
-				long interval = 0;
-				dateTimeLast = getDateByViecheId(RoadID, viechId);
-				interval = (dateTime.getTime() - dateTimeLast.getTime()) / 1000;
-				double dist = Math.sqrt(Math.pow(lan - lanLast, 2) + Math.pow(lon - lonLast, 2));
-
-				if (dist > DIST0 && interval > INTERVAL0) {					
-
-					Road.count ++;
-					Road.dateTime = dateTime;
-					Road.RoadSpd.put(viechId, dateTime);
-					Road.vieLngLatIDList.put(viechId, lon+"_"+lan);	
-				}else{
-					return;					
-				}
-			}*/
+			
+	
 		}
 
 
@@ -246,7 +203,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		SimpleDateFormat sdf3= new SimpleDateFormat("yyyy-MM-dd");
 		int min=nowDate.getMinutes();
 		int second=nowDate.getSeconds();
-		if( (min%2) ==0 && (second==0) ){
+		if( (min%1) ==0 && (second==0) ){
 			String nowTime=sdf2.format(nowDate);
 
 
@@ -328,7 +285,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 //            	  br.write(d.RoadId+","+d.count+"#"+d.RoadSpd.values()+";"+
 //                    d.vieLngLatIDList.values()+"\n"); 
             	  br.write(d.roadId+","+d.count+","+d.avgSpd);
-            	           	  
+            	  System.out.print(d.roadId+","+d.count+","+d.avgSpd);         	  
 /*          		for(Map.Entry<String,Date> entry : d.roadSpd.entrySet()){   //
           			String lonLanString=d.vieLngLatIDList.get(entry.getKey()); 
           			//if(entry.getKey()!=null && entry.getValue()!=null && lonLanString!=null)

@@ -7,10 +7,10 @@ class RealTimeTrafficTopology {
 	+void main(String[] args)
 }
 
-RealTimeTrafficTopology-->FieldListenerSpout:GPSDataLine >
+RealTimeTrafficTopology-->JavaSocketSpout:GPSDataLine >
 
 
-class FieldListenerSpout {
+class JavaSocketSpout {
 	~SpoutOutputCollector _collector
 	~Random _rand
 	-String file
@@ -22,9 +22,9 @@ class FieldListenerSpout {
 }
 abstract class BaseRichSpout {
 }
-BaseRichSpout <|-- FieldListenerSpout
+BaseRichSpout <|.. JavaSocketSpout
 
-FieldListenerSpout->MapMatchingBolt:tuple >
+JavaSocketSpout-->MapMatchingBolt:tuple >
 
 
 
@@ -39,7 +39,7 @@ interface IRichBolt {
 }
 IRichBolt <|.. MapMatchingBolt
 
-MapMatchingBolt->SpeedCalculatorBolt: tuple >
+MapMatchingBolt-->SpeedCalculatorBolt: tuple >
 
 
 
@@ -57,7 +57,7 @@ interface IRichBolt {
 }
 IRichBolt <|.. SpeedCalculatorBolt
 
-
+SpeedCalculatorBolt-->WebFront
 
 class tupleInfo {
 	-String viechleID
@@ -71,41 +71,8 @@ class tupleInfo {
 	+String getDelimiter()
 }
 
-thresholdInfo-->SpeedCalculatorBolt: call 
-thresholdInfo-->MapMatchingBolt: call 
-thresholdInfo-->DBWriterBolt: call 
+tupleInfo--JavaSocketSpout :< call
 
-class thresholdInfo {
-	-String action
-	-String rule
-	-Object thresholdValue
-	-int thresholdColNumber
-	-Integer timeWindow
-	-int frequencyOfOccurence
-	+int getThresholdColNumber()
-	+Object getThresholdValue()
-	+int getFrequencyOfOccurence()
-	+String getAction()
-	+Integer getTimeWindow()
-}
-class tupleInfo {
-}
-tupleInfo <|-- thresholdInfo
-interface Serializable {
-}
-Serializable <|.. thresholdInfo
-
-
-class DBWriterBolt {
-	+void prepare(Map StormConf, TopologyContext context)
-	+void execute(Tuple tuple, BasicOutputCollector collector)
-	+void executeBatch()
-}
-interface IRichBolt {
-}
-IRichBolt <|.. DBWriterBolt
-
-SpeedCalculatorBolt->DBWriterBolt: tuple >
 
 
 
