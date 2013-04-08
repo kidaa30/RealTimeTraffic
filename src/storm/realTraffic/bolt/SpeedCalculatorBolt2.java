@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import backtype.storm.task.OutputCollector;
@@ -32,6 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 
+import storm.realTraffic.gis.FixedSizeQueue;
+
 
 /**
  * realODMatrix realODMatrix.bolt CountBolt.java
@@ -41,7 +44,7 @@ import org.geotools.feature.visitor.AverageVisitor.AverageResult;
  * email: gh.chen@siat.ac.cn
  *
  */
-public class SpeedCalculatorBolt implements IRichBolt {
+public class SpeedCalculatorBolt2 implements IRichBolt {
 
 	/**
 	 * 
@@ -73,7 +76,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 	public class Road 
 	{
 		public Road(){}
-		public Road(String roadID, ArrayList<Integer>  roadSpd) {
+		public Road(String roadID, FixedSizeQueue<Integer>  roadSpd) {
 			// TODO Auto-generated constructor stub
 			this.roadId=roadID;
 			this.roadSpd=roadSpd;
@@ -82,7 +85,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		public String roadId;
 		public int count;//计算次数，是车牌号的个数码
 		//public Date dateTime; //该路线统计的车辆出现时间
-		ArrayList<Integer> roadSpd;
+		FixedSizeQueue<Integer> roadSpd;
 		int avgSpd;
 		//public HashMap<String,spdList> roadSpd; //存放车辆Id的集合,也要把时间存者，以对每一辆车进行计算时间距离
 		//public HashMap<String,String> vieLngLatIDList; //存放车辆Id的集合,也要把时间存者，以对每一辆车进行计算时间距离
@@ -172,7 +175,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		if (!isDisExits(Roads, RoadID)) {
 			 //没有此路线，则新建一个路径，并存起来				
 			//System.out.println("RoadID:"+RoadID+"dateTime:"+dateTime+"viechId"+viechId);
-			ArrayList<Integer> roadSpd = new ArrayList<Integer>() ; 
+			FixedSizeQueue<Integer> roadSpd = new FixedSizeQueue<Integer>(20) ; 
 			roadSpd.add(speed);
 			Road road = new Road();
 			road.roadId = RoadID;		
@@ -190,33 +193,35 @@ public class SpeedCalculatorBolt implements IRichBolt {
 
 
 			int sum=0;
-            road.count++;
-        	road.roadSpd.add(speed);
-        	
-			//double avg=getAvgById(RoadID);
-
-			//if(road.roadSpd.size()>=3){
-				for(int i=0;i<road.count;i++){
-					sum=sum+road.roadSpd.get(i);				 
-				} 
+			if(road.roadSpd.size()<=2){
+				road.count++;
+				road.roadSpd.add(speed);
+				for(Integer it : road.roadSpd){
+					sum=sum+it;		
+				}
 				road.avgSpd=(int)((double)sum)/road.count;
+			}else{
+			
+			    double avg=getAvgById(RoadID);
 
-//				double temp=0;
-//				for(int i=0;i<road.roadSpd.size();i++)
-//				{
-//					temp+=Math.pow((road.roadSpd.get(i)-avg), 2);
-//				}
-//				temp = temp/(road.roadSpd.size()-1);
-//				double standdev =  Math.sqrt(temp);
-//				if(  Math.abs(speed-avg) <=2* standdev  )
-//				{
-//					road.count++;
-//					road.roadSpd.add(speed);	
-//					road.avgSpd=(int) avg;
+				double temp=0;
+				for(Integer it : road.roadSpd)
+				{
+					sum=sum+it;		
+					temp+=Math.pow((it-avg), 2);
+				}
+				//double avg=getAvgById(RoadID);
+				temp = temp/(road.roadSpd.size()-1);
+				double standdev =  Math.sqrt(temp);
+				if(  Math.abs(speed-avg) <=2* standdev  )
+				{
+					road.count++;
+					road.roadSpd.add(speed);	
+					road.avgSpd=(int) avg;
 					System.out.println(road.count+":"+road.avgSpd);
-//				}
+				}
 
-			//}
+			}
 			
 	
 		}
@@ -240,7 +245,7 @@ public class SpeedCalculatorBolt implements IRichBolt {
 
 			 cur_dir=cur_dir+"/"+nowTime;
 
-			SpeedCalculatorBolt.writeToFile(cur_dir,d);
+			SpeedCalculatorBolt2.writeToFile(cur_dir,d);
 
 			try {
 				Thread.sleep(1000);

@@ -47,7 +47,7 @@ public class MapMatchingBolt implements IRichBolt {
 	List<Object> inputLine; 
 	Fields matchBoltDeclare=null;
 
-	static String path = "/home/ghchen/sects/szRoads/SZRoads.shp";
+	static String path = "/home/ghchen/shenzhenRoad-tuWei/SZRoad_new2.shp";
 	static roadgridList sects=null ;	
 	static int count=0;
 
@@ -65,19 +65,17 @@ public class MapMatchingBolt implements IRichBolt {
 
 
 	public void execute(Tuple input) {
-		// TODO Auto-generated method stub
-		//String path = "E:/datasource/sztb/dat/base/sects/Sects.shp";
 
 		try {
-			if(sects==null){
-			sects= new roadgridList(path);
+			if(sects.equals(null)){
+			sects= new roadgridList(path);			
 			}
 			//System.out.println("District Match input:"+input.toString());
-			//FieldListenerSpout.writeToFile("/home/ghchen/output","District Match input:"+input.toString());
+			FieldListenerSpout.writeToFile("mapBoltInput",input.toString());
  
 
 		  List<Object> inputLine = input.getValues();//getFields();
-		  Fields inputLineFields = input.getFields();
+		 // Fields inputLineFields = input.getFields();
 	//FieldListenerSpout.writeToFile("/home/ghchen/output","DistrictMap inputLineFields"+inputLineFields);	  
 
 
@@ -99,7 +97,7 @@ public class MapMatchingBolt implements IRichBolt {
 			if(roadID!=-1)
 			{
 				System.out.print("[count:"+count++ +"]: GPS Point falls into Road No. :" + roadID);
-				//FieldListenerSpout.writeToFile("/home/ghchen/roadID","DistrictBolt GPS Point falls into Sect No. ::"+roadID.toString());
+				FieldListenerSpout.writeToFile("roadID","GPS Point falls into Sect No. :"+roadID.toString()+"\n");
 
 
 
@@ -117,7 +115,7 @@ public class MapMatchingBolt implements IRichBolt {
 				//			FieldListenerSpout.writeToFile("/home/ghchen/map-oput",obToStrings[i]+",");
 				//			FieldListenerSpout.writeToFile("/home/ghchen/map-oput","\n");
 
-
+               System.out.print("[ Emit success:"+ count + "]");
 				_collector.emit(new Values(obToStrings));
 				//_collector.emit(new Values(inputLine));
 			}
@@ -128,6 +126,7 @@ public class MapMatchingBolt implements IRichBolt {
 		}	
 
 		_collector.ack(input);
+	
 
 	}
 

@@ -11,6 +11,7 @@ package storm.realTraffic;
 //import storm.realTraffic.bolt.DBWriterBolt;
 import storm.realTraffic.bolt.MapMatchingBolt;
 import storm.realTraffic.bolt.SpeedCalculatorBolt;
+import storm.realTraffic.bolt.SpeedCalculatorBolt2;
 import storm.realTraffic.spout.FieldListenerSpout;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -32,21 +33,22 @@ public class RealTimeTrafficTopology {
 
 	MapMatchingBolt districtMacthingBolt=new MapMatchingBolt(); 
 	SpeedCalculatorBolt spdBolt =new SpeedCalculatorBolt();
+	//SpeedCalculatorBolt2 spdBolt =new SpeedCalculatorBolt2();
 //	DBWritterBolt dbWriterBolt = new DBWritterBolt();	
 
 
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("spout", fieldListenerSpout,1);	        
-        builder.setBolt("matchingBolt", districtMacthingBolt,54).shuffleGrouping("spout");	        
+        builder.setBolt("matchingBolt", districtMacthingBolt,56).shuffleGrouping("spout");	        
        // builder.setBolt("countBolt",countBolt,6).shuffleGrouping("matchingBolt"); 
-        builder.setBolt("countBolt",spdBolt,4).fieldsGrouping("matchingBolt",new Fields("roadID")); 
+        builder.setBolt("countBolt",spdBolt,3).fieldsGrouping("matchingBolt",new Fields("roadID")); 
        //builder.setBolt("dbBolt",dbWriterBolt,2).shuffleGrouping("countBolt");
 	    Config conf = new Config();
         if(args!=null && args.length > 0) {
             conf.setNumWorkers(60);            
 
-            //LocalCluster  cluster= new LocalCluster();
+           // LocalCluster  cluster= new LocalCluster();
             //cluster.submitTopology(args[0], conf, builder.createTopology());
             StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
         } 
