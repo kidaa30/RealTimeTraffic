@@ -34,6 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 
 import storm.realTraffic.gis.FixedSizeQueue;
+import storm.realTraffic.spout.FieldListenerSpout;
 
 
 /**
@@ -146,16 +147,6 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 	@Override	
 	public void execute(Tuple input) {
 		
-		
-		try {
-			br = new BufferedWriter(new FileWriter("sucess",true));
-			 br.write(++count +":"+input.toString()+"\n");
-			 System.out.print(++count +":"+input.toString()+"\n");
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		
 		//System.out.println("SpeedCalBolt: "+input.getValues().toString());
 
 		String RoadID = input.getValues().get(7).toString();
@@ -174,13 +165,15 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 
 		if (!isDisExits(Roads, RoadID)) {
 			 //没有此路线，则新建一个路径，并存起来				
-			//System.out.println("RoadID:"+RoadID+"dateTime:"+dateTime+"viechId"+viechId);
-			FixedSizeQueue<Integer> roadSpd = new FixedSizeQueue<Integer>(20) ; 
-			roadSpd.add(speed);
+			//System.out.print("RoadID1  ");
 			Road road = new Road();
+			/*FixedSizeQueue<Integer>*/ 
+			road.roadSpd = new FixedSizeQueue<Integer>(30) ; 
+			road.roadSpd.add(speed);
+			
 			road.roadId = RoadID;		
 			road.count = 1;
-			road.roadSpd=roadSpd;
+			road.roadSpd=road.roadSpd;
 			
 			road.avgSpd=speed;
 			
@@ -188,64 +181,70 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 			//return ;
 
 		}else{   //如果已经有该路线
+			
 			Road road=getRoadById(RoadID);
 			//if(!Road.roadSpd.contains(viechId)){  //但是如果车辆ID是第一次进入该区域，新建一个车辆ID，并保存；
 
 
 			int sum=0;
-			if(road.roadSpd.size()<=2){
+			if(road.roadSpd.size()<2){
+				System.out.print("  RoadID2  ");
 				road.count++;
 				road.roadSpd.add(speed);
+				//FieldListenerSpout.writeToFile("SpeedList", RoadID+":");
 				for(Integer it : road.roadSpd){
+					//FieldListenerSpout.writeToFile("SpeedList", it+",");
 					sum=sum+it;		
 				}
-				road.avgSpd=(int)((double)sum)/road.count;
+				//FieldListenerSpout.writeToFile("SpeedList", "\n");
+				
+				road.avgSpd=(int)((double)sum/(double)road.roadSpd.size());
 			}else{
-			
-			    double avg=getAvgById(RoadID);
+				System.out.print("RoadID3  ");
+			    double avgLast=getAvgById(RoadID);
 
 				double temp=0;
+				FieldListenerSpout.writeToFile("SpeedList", RoadID+":");
 				for(Integer it : road.roadSpd)
 				{
+					FieldListenerSpout.writeToFile("SpeedList", it+",");
 					sum=sum+it;		
-					temp+=Math.pow((it-avg), 2);
+					temp+=Math.pow((it-avgLast), 2);
 				}
-				//double avg=getAvgById(RoadID);
-				temp = temp/(road.roadSpd.size()-1);
+				FieldListenerSpout.writeToFile("SpeedList", "\n");
+				int avgCurrent=(int) ((sum+speed)/((double)road.roadSpd.size()+1));
+				temp =(temp+ Math.pow( (speed-avgLast),2 ))/(road.roadSpd.size());
 				double standdev =  Math.sqrt(temp);
-				if(  Math.abs(speed-avg) <=2* standdev  )
+				if(  Math.abs(speed-avgCurrent) <=2*standdev  )
 				{
 					road.count++;
 					road.roadSpd.add(speed);	
-					road.avgSpd=(int) avg;
-					System.out.println(road.count+":"+road.avgSpd);
+					road.avgSpd=avgCurrent;
+					System.out.println("\n\naverage speed:"+road.count+":"+road.avgSpd+"\n\n");
 				}
-
-			}
-			
-	
+			}	
 		}
-
-
 		Date nowDate=new Date();
 		SimpleDateFormat sdf2= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		SimpleDateFormat sdf3= new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf4= new SimpleDateFormat("yyyy-MM-dd-HH");
 		int min=nowDate.getMinutes();
 		int second=nowDate.getSeconds();
-		if( /*(min%1) ==0 && */(second==0) ){
-			String nowTime=sdf2.format(nowDate);
+		if( (min%2) ==0 && (second==0) ){
+			//String nowTime=sdf2.format(nowDate);
 
 
-			LinkedList<Road> d=new  LinkedList<Road> (Roads);
+			//LinkedList<Road> d=new  LinkedList<Road> (Roads);
 			//Roads.clear();
 
 			 String cur_dir=System.getProperty("user.dir");
-			 cur_dir=cur_dir+"/real-traffic/"+sdf3.format(nowDate);
+			 cur_dir=cur_dir+"/real-traffic";//+sdf3.format(nowDate);			 
 			 newFolder(cur_dir);
+			 cur_dir=cur_dir+"/"+sdf3.format(nowDate);
+			 newFolder(cur_dir);
+			 cur_dir=cur_dir+"/"+sdf4.format(nowDate);
 
-			 cur_dir=cur_dir+"/"+nowTime;
-
-			SpeedCalculatorBolt2.writeToFile(cur_dir,d);
+			SpeedCalculatorBolt2.writeToFile(cur_dir,Roads);
 
 			try {
 				Thread.sleep(1000);
@@ -304,27 +303,53 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
         }  
     } 
     
-	public static void writeToFile(String fileName, LinkedList<Road> Roads){
+	/*public static void writeToFile(String fileName, LinkedList<Road> Roads){
 		try {
               BufferedWriter br = new BufferedWriter(new FileWriter(fileName,true));
-     		  SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//				String nowtime=sdf.format(new Date());
+     		  SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+				String nowtime=sdf.format(new Date());
      		  // ddRoad=Roads;
               for(Road d:Roads){
 //            	  br.write(d.RoadId+","+d.count+"#"+d.RoadSpd.values()+";"+
 //                    d.vieLngLatIDList.values()+"\n"); 
             	  br.write(d.roadId+","+d.count+","+d.avgSpd);
             	  System.out.print(d.roadId+","+d.count+","+d.avgSpd);         	  
-/*          		for(Map.Entry<String,Date> entry : d.roadSpd.entrySet()){   //
-          			String lonLanString=d.vieLngLatIDList.get(entry.getKey()); 
-          			//if(entry.getKey()!=null && entry.getValue()!=null && lonLanString!=null)
-          			br.write(entry.getKey()+","+sdf.format(entry.getValue()) +","+lonLanString+";");
-         			System.out.println(entry.getKey()+","+entry.getValue()+","+lonLanString+";");
-          			}*/
+
           		
           		br.write("\r\n");
 
           		//System.out.println("\n");
+              }         
+           
+     	      br.flush();
+		      br.close();		      
+        	  Roads.clear();				
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}		
+	}*/
+
+	
+	public static void writeToFile(String fileName, LinkedList<Road> Roads){
+		try {
+	    	String[] name=fileName.split("/");
+	    	String tmp=null;
+	    	if(name[name.length-1].length()>13) {tmp=fileName.substring(0, fileName.length()-6);
+	    	}else{
+	    		tmp=fileName;
+	    	}
+	    	BufferedWriter br = new BufferedWriter(new FileWriter(tmp,true));
+             // BufferedWriter br = new BufferedWriter(new FileWriter(fileName,true));
+     		  SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+				String nowtime=sdf.format(new Date());
+     		  // ddRoad=Roads;
+              for(Road d:Roads){
+//            	  br.write(d.RoadId+","+d.count+"#"+d.RoadSpd.values()+";"+
+//                    d.vieLngLatIDList.values()+"\n"); 
+            	  br.write("\n"+nowtime+","+d.roadId+","+d.avgSpd+","+d.roadSpd.size());
+            	  br.flush();
+            	  System.out.print(nowtime+","+d.roadId+","+d.avgSpd+","+d.roadSpd.size()+"\n");         	  
               }         
            
               /*for(Road d : Roads){
@@ -337,9 +362,8 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
             		  br.write(id+"    ");
             	  }
               }*/
-		      br.flush();
-		      br.close();		      
-        	  Roads.clear();				
+		      br.close();	      
+        			
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

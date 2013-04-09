@@ -32,23 +32,23 @@ public class RealTimeTrafficTopology {
     FieldListenerSpout fieldListenerSpout = new FieldListenerSpout();
 
 	MapMatchingBolt districtMacthingBolt=new MapMatchingBolt(); 
-	SpeedCalculatorBolt spdBolt =new SpeedCalculatorBolt();
-	//SpeedCalculatorBolt2 spdBolt =new SpeedCalculatorBolt2();
+	//SpeedCalculatorBolt spdBolt =new SpeedCalculatorBolt();
+	SpeedCalculatorBolt2 spdBolt =new SpeedCalculatorBolt2();
 //	DBWritterBolt dbWriterBolt = new DBWritterBolt();	
 
 
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("spout", fieldListenerSpout,1);	        
-        builder.setBolt("matchingBolt", districtMacthingBolt,56).shuffleGrouping("spout");	        
+        builder.setBolt("RoadMatchingBolt", districtMacthingBolt,54).shuffleGrouping("spout");	        
        // builder.setBolt("countBolt",countBolt,6).shuffleGrouping("matchingBolt"); 
-        builder.setBolt("countBolt",spdBolt,3).fieldsGrouping("matchingBolt",new Fields("roadID")); 
+        builder.setBolt("SpeedCalculatorBolt",spdBolt,4).fieldsGrouping("RoadMatchingBolt",new Fields("roadID")); 
        //builder.setBolt("dbBolt",dbWriterBolt,2).shuffleGrouping("countBolt");
 	    Config conf = new Config();
         if(args!=null && args.length > 0) {
             conf.setNumWorkers(60);            
 
-           // LocalCluster  cluster= new LocalCluster();
+            //LocalCluster  cluster= new LocalCluster();
             //cluster.submitTopology(args[0], conf, builder.createTopology());
             StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
         } 

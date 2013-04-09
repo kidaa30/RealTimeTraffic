@@ -278,7 +278,8 @@ public class roadgridList {
 	}*/
 	static int count=0;
 	public int fetchRoadID(Point p) throws Exception{
-		int roadID = -1;
+		//int roadID = -1;
+		int lastMiniRoadID=-2;
 
 		Integer mapID_lon=(int)(p.x*10);
 		Integer mapID_lan=(int)(p.y*10);
@@ -286,27 +287,29 @@ public class roadgridList {
 		double minD=Double.MAX_VALUE;
 		int width=0;
 		DecimalFormat df = new DecimalFormat("#.0000");
-
+        
+		int gridCount=0;
+		int roadCount=0;
 		for (Map.Entry<String, RoadList> grid : this.gridList.entrySet()) {			
-
+			gridCount++;
 			String s=grid.getKey();  //mapID
-			int sect_mapID_lan=Integer.parseInt(s.split("_")[0]);
-			int sect_mapID_lon=Integer.parseInt(s.split("_")[1]);
+			//int sect_mapID_lan=Integer.parseInt(s.split("_")[0]);
+			//int sect_mapID_lon=Integer.parseInt(s.split("_")[1]);
 
 			/*if (Math.abs(sect_mapID_lon-mapID_lon)>1 || Math.abs(sect_mapID_lan-mapID_lan)>1 ){
 				continue;  //不在GPS点所在的九个格子里
 			}*/
-			if (!mapID.equals(s) ){
+			/*if (!mapID.equals(s) ){
 				continue;  //不在GPS点所在的格子里,跳出，到下一个格子
 			}
-			else {  //在格子内
+			else*/ 
+			if (mapID.equals(s) ){  //在格子内
 				for (SimpleFeature feature: grid.getValue()) {
 					//SimpleFeature feature=road.getValue();
-
-					int  returnRoadID = Integer.parseInt(feature.getAttribute("ID").toString());
-					
+					roadCount++;
+					int  returnRoadID = Integer.parseInt(feature.getAttribute("ID").toString());					
 					width=Integer.parseInt(feature.getAttribute("WIDTH").toString());
-					if(width<=0)width=10;
+					if(width<=0)width=5;
 					String geoStr=feature.getDefaultGeometry().toString();	
 					MultiLineString linearRing= new MultiLineString(geoStr);   				
 					ArrayList<Point> ps = new ArrayList<Point>();
@@ -319,29 +322,30 @@ public class roadgridList {
 					for (int i = 0; i < n - 1; i++) {
 						double distance=Polygon.pointToLine(ps.get(i).x,ps.get(i).y,ps.get(i+1).x,ps.get(i+1).y,p.x,p.y)*111.2*1000 ;
 						//double distance=Polygon.DistancePointToLine(ps.get(i).x,ps.get(i).y,ps.get(i+1).x,ps.get(i+1).y,p.x,p.y);
-						if(distance<minD) {
-							minD=distance;
-							roadID=returnRoadID;
 
+						if (distance<width) {  
+							System.out.printf("\ngridCount:%2d  roadCount:%5d  Less width,dist=%6.3f ",gridCount,roadCount,distance);
+							return returnRoadID;
 						}
+						else if(distance<minD) {
+							minD=distance;
+							lastMiniRoadID=returnRoadID;
+							}
 					}
 				}
+				System.out.printf("\ngridCount:%2d  roadCount:%5d  Minimum dist=%6.3f ",gridCount,roadCount,minD);
+				if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) )) {  //sqrt(2) * width
+					
+					return lastMiniRoadID;
+				}
+				else 
+					return -1;
 			}
 		}
 
-		//String mD=df.format(minD);
-		 NumberFormat ddf1=NumberFormat.getNumberInstance();		    
-		 ddf1.setMaximumFractionDigits(3);
-		 ddf1.setMaximumIntegerDigits(5);
-		 String mD= ddf1.format(minD) ;
-		if(mD.length()>=5) mD=mD.substring(0, 5);
-		System.out.print(/*"\n[count:"+count+*/"\nThe minimum distance="+mD+"\t");
-		if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) )) {  //sqrt(2) * width
-			
-			return roadID;
-		}
-		else 
-			return -1;
+	
+
+		return -1;
 	}
 
 

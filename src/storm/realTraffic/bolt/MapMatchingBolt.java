@@ -39,7 +39,7 @@ public class MapMatchingBolt implements IRichBolt {
 	//private static final long serialVersionUID = 1L;
 	private OutputCollector _collector;
 
-	Integer roadID ;
+	Integer roadID =null;
 	GPSRcrd record;
 	Map<GPSRcrd, Integer> gpsMatch;  //map<GPSRcrd,roadID>
 	Integer taskID;
@@ -49,8 +49,8 @@ public class MapMatchingBolt implements IRichBolt {
 
 	static String path = "/home/ghchen/shenzhenRoad-tuWei/SZRoad_new2.shp";
 	static roadgridList sects=null ;	
-	static int count=0;
-
+	static int count1=0;
+	static int count2=0;
 
 
 
@@ -65,19 +65,19 @@ public class MapMatchingBolt implements IRichBolt {
 
 
 	public void execute(Tuple input) {
-
+		count1++;
 		try {
-			if(sects.equals(null)){
+			if(sects==null){
 			sects= new roadgridList(path);			
 			}
 			//System.out.println("District Match input:"+input.toString());
-			FieldListenerSpout.writeToFile("mapBoltInput",input.toString());
+			//FieldListenerSpout.writeToFile("mapBoltInput",input.toString());
  
 
 		  List<Object> inputLine = input.getValues();//getFields();
-		 // Fields inputLineFields = input.getFields();
-	//FieldListenerSpout.writeToFile("/home/ghchen/output","DistrictMap inputLineFields"+inputLineFields);	  
-
+	  
+		  String speed=(String) inputLine.get(3);
+		  if(speed.equals("0")) return;
 
 			record=new GPSRcrd(Double.parseDouble((String) inputLine.get(6)), 
 					Double.parseDouble((String) inputLine.get(5)), Integer.parseInt((String) inputLine.get(3)), 
@@ -95,9 +95,9 @@ public class MapMatchingBolt implements IRichBolt {
 			roadID = sects.fetchRoadID(record);
 
 			if(roadID!=-1)
-			{
-				System.out.print("[count:"+count++ +"]: GPS Point falls into Road No. :" + roadID);
-				FieldListenerSpout.writeToFile("roadID","GPS Point falls into Sect No. :"+roadID.toString()+"\n");
+			{   count2++;
+				System.out.print("["+count1+":"+count2 +"]: GPS falls Road No. :" + roadID);
+				//FieldListenerSpout.writeToFile("roadID","GPS Point falls into Sect No. :"+roadID.toString()+"\n");
 
 
 
@@ -115,7 +115,7 @@ public class MapMatchingBolt implements IRichBolt {
 				//			FieldListenerSpout.writeToFile("/home/ghchen/map-oput",obToStrings[i]+",");
 				//			FieldListenerSpout.writeToFile("/home/ghchen/map-oput","\n");
 
-               System.out.print("[ Emit success:"+ count + "]");
+              // System.out.print("[ Emit success:"+ count + "]");
 				_collector.emit(new Values(obToStrings));
 				//_collector.emit(new Values(inputLine));
 			}
