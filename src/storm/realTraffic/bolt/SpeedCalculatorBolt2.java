@@ -173,7 +173,7 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 			
 			road.roadId = RoadID;		
 			road.count = 1;
-			road.roadSpd=road.roadSpd;
+			//road.roadSpd=road.roadSpd;
 			
 			road.avgSpd=speed;
 			
@@ -191,27 +191,24 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 				System.out.print("  RoadID2  ");
 				road.count++;
 				road.roadSpd.add(speed);
-				//FieldListenerSpout.writeToFile("SpeedList", RoadID+":");
+
 				for(Integer it : road.roadSpd){
-					//FieldListenerSpout.writeToFile("SpeedList", it+",");
 					sum=sum+it;		
-				}
-				//FieldListenerSpout.writeToFile("SpeedList", "\n");
-				
+				}				
 				road.avgSpd=(int)((double)sum/(double)road.roadSpd.size());
 			}else{
 				System.out.print("RoadID3  ");
 			    double avgLast=getAvgById(RoadID);
 
 				double temp=0;
-				FieldListenerSpout.writeToFile("SpeedList", RoadID+":");
+				//FieldListenerSpout.writeToFile("SpeedList", RoadID+":");
 				for(Integer it : road.roadSpd)
 				{
-					FieldListenerSpout.writeToFile("SpeedList", it+",");
+					//FieldListenerSpout.writeToFile("SpeedList", it+",");
 					sum=sum+it;		
 					temp+=Math.pow((it-avgLast), 2);
 				}
-				FieldListenerSpout.writeToFile("SpeedList", "\n");
+				//FieldListenerSpout.writeToFile("SpeedList", "\n");
 				int avgCurrent=(int) ((sum+speed)/((double)road.roadSpd.size()+1));
 				temp =(temp+ Math.pow( (speed-avgLast),2 ))/(road.roadSpd.size());
 				double standdev =  Math.sqrt(temp);
