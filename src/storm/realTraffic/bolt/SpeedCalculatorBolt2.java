@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.geotools.feature.visitor.AverageVisitor.AverageResult;
 
 import storm.realTraffic.gis.FixedSizeQueue;
@@ -62,10 +61,11 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 	Integer taskId;
 	String taskName;
 	//Map<String, List<String> > Roads; //RoadID, vehicleIdsInThisArea
-	public  LinkedList<Road>  Roads = new  LinkedList<Road>();
+	public static  LinkedList<Road>  Roads = new  LinkedList<Road>();
 	//static public List<String> vehicleIdsInThisArea=new ArrayList<String>(); 
 	Integer cnt;
 	Timer timer;
+	MySqlClass mysql=null;
 	
 	public class spdList extends ArrayList<Integer>{
 		private static final long serialVersionUID = 1L;
@@ -217,22 +217,22 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 					road.count++;
 					road.roadSpd.add(speed);	
 					road.avgSpd=avgCurrent;
-					System.out.println("\n\naverage speed:"+road.count+":"+road.avgSpd+"\n\n");
+					//System.out.println("\n\naverage speed:"+road.count+":"+road.avgSpd+"\n\n");
 				}
 			}	
 		}
+		if(mysql==null) mysql=new MySqlClass("172.20.36.247","3306","realTimeTraffic", "ghchen", "ghchen");
 		Date nowDate=new Date();
 		SimpleDateFormat sdf2= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		SimpleDateFormat sdf3= new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf4= new SimpleDateFormat("yyyy-MM-dd-HH");
 		int min=nowDate.getMinutes();
 		int second=nowDate.getSeconds();
-		if( (min%2) ==0 && (second==0) ){
-			//String nowTime=sdf2.format(nowDate);
-
-
-			//LinkedList<Road> d=new  LinkedList<Road> (Roads);
-			//Roads.clear();
+		if( /*(min%2) ==0 && */(second==0) ){			
+			
+			mysql.query("delete from realTimeTraffic.roadSpeed");
+			SpeedCalculatorBolt2.writeToMysql(mysql, Roads);
+			
 
 			 String cur_dir=System.getProperty("user.dir");
 			 cur_dir=cur_dir+"/real-traffic";//+sdf3.format(nowDate);			 
@@ -300,33 +300,6 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
         }  
     } 
     
-	/*public static void writeToFile(String fileName, LinkedList<Road> Roads){
-		try {
-              BufferedWriter br = new BufferedWriter(new FileWriter(fileName,true));
-     		  SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-				String nowtime=sdf.format(new Date());
-     		  // ddRoad=Roads;
-              for(Road d:Roads){
-//            	  br.write(d.RoadId+","+d.count+"#"+d.RoadSpd.values()+";"+
-//                    d.vieLngLatIDList.values()+"\n"); 
-            	  br.write(d.roadId+","+d.count+","+d.avgSpd);
-            	  System.out.print(d.roadId+","+d.count+","+d.avgSpd);         	  
-
-          		
-          		br.write("\r\n");
-
-          		//System.out.println("\n");
-              }         
-           
-     	      br.flush();
-		      br.close();		      
-        	  Roads.clear();				
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}		
-	}*/
-
 	
 	public static void writeToFile(String fileName, LinkedList<Road> Roads){
 		try {
@@ -366,6 +339,18 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 			e1.printStackTrace();
 		}		
 	}
+	
+	public static void writeToMysql(MySqlClass mysql,LinkedList<Road> Roads){
+	SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	String nowtime=sdf.format(new Date());
+    for(Road road:Roads){
+    int rs=mysql.query("insert into realTimeTraffic.roadSpeed(time,roadID,speed,count) values('"+nowtime
+    		+"','"+road.roadId+"',"+road.avgSpd+","+road.count+" );");
+    if(rs!=0) System.out.println("Insert into Mysql success :   "+road.roadId+"',"+road.avgSpd); 
+    } 
+    
+    
+   }
 
 	 public static void newFolder(String folderPath) { 
 		    try { 
@@ -381,5 +366,4 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 		      e.printStackTrace(); 
 		    } 
 		  }
-
 }

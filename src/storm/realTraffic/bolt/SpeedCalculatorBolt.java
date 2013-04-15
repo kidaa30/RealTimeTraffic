@@ -230,17 +230,13 @@ public class SpeedCalculatorBolt implements IRichBolt {
 		if( /*(min%1) ==0 && */(second==0) ){
 			String nowTime=sdf2.format(nowDate);
 
-
-			LinkedList<Road> d=new  LinkedList<Road> (Roads);
-			//Roads.clear();
-
 			 String cur_dir=System.getProperty("user.dir");
 			 cur_dir=cur_dir+"/real-traffic/"+sdf3.format(nowDate);
 			 newFolder(cur_dir);
 
 			 cur_dir=cur_dir+"/"+nowTime;
 
-			SpeedCalculatorBolt.writeToFile(cur_dir,d);
+			SpeedCalculatorBolt.writeToFile(cur_dir,Roads);
 
 			try {
 				Thread.sleep(1000);
@@ -271,34 +267,26 @@ public class SpeedCalculatorBolt implements IRichBolt {
 	@Override
 	public void cleanup() {
 		System.out.println("-- Real Time Traffic ["+taskName+"-"+taskId+"] --");
-//		for(Map.Entry<GPSRcrd, Integer> entry : gpsMatch.entrySet()){
-//		System.out.println(entry.getKey()+": "+entry.getValue());
-//		}
 
 	}
-
-
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		// TODO Auto-generated method stub
 		declarer.declare(new Fields("Roads"));
 	}
 
-
 	@Override
 	public Map<String, Object> getComponentConfiguration() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
     static class Job extends java.util.TimerTask{   
         @Override  
         public void run() {   
             // TODO Auto-generated method stub  
          
         }  
-    } 
-    
+    }     
 	public static void writeToFile(String fileName, LinkedList<Road> Roads){
 		try {
               BufferedWriter br = new BufferedWriter(new FileWriter(fileName,true));
@@ -318,20 +306,8 @@ public class SpeedCalculatorBolt implements IRichBolt {
           			}*/
           		
           		br.write("\r\n");
-
           		//System.out.println("\n");
-              }         
-           
-              /*for(Road d : Roads){
-               	  br.write(d.RoadId + ","+ d.count + "#");
-            	  HashMap<String ,String> viechIds = d.vieLngLatIDList;
-            	  Set<String> set = viechIds.keySet();
-            	  Iterator<String> iterator = set.iterator();
-            	  while(iterator.hasNext()){
-            		  String id = iterator.next();
-            		  br.write(id+"    ");
-            	  }
-              }*/
+              }
 		      br.flush();
 		      br.close();		      
         	  Roads.clear();				

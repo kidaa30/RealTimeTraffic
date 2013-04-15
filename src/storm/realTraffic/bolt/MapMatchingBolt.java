@@ -48,9 +48,10 @@ public class MapMatchingBolt implements IRichBolt {
 	Fields matchBoltDeclare=null;
 
 	static String path = "/home/ghchen/shenzhenRoad-tuWei/SZRoad_new2.shp";
-	static roadgridList sects=null ;	
+	public static roadgridList sects=null ;	
 	static int count1=0;
 	static int count2=0;
+	public static int count3=0;
 
 
 
@@ -68,6 +69,7 @@ public class MapMatchingBolt implements IRichBolt {
 		count1++;
 		try {
 			if(sects==null){
+			count3++;
 			sects= new roadgridList(path);			
 			}
 			//System.out.println("District Match input:"+input.toString());
@@ -96,7 +98,7 @@ public class MapMatchingBolt implements IRichBolt {
 
 			if(roadID!=-1)
 			{   count2++;
-				System.out.print("["+count1+":"+count2 +"]: GPS falls Road No. :" + roadID);
+				System.out.print("["+count1+":"+count2 +":"+count3+"]: GPS falls Road No. :" + roadID);
 				//FieldListenerSpout.writeToFile("roadID","GPS Point falls into Sect No. :"+roadID.toString()+"\n");
 
 

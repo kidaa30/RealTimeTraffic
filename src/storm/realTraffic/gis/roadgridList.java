@@ -25,6 +25,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.postgis.MultiLineString;
 
 import storm.realTraffic.bolt.MapMatchingBolt;
+import storm.realTraffic.spout.FieldListenerSpout;
 
 import backtype.storm.tuple.Values;
 
@@ -104,17 +105,6 @@ public class roadgridList {
 	}
 
 
-
-
-	public roadgridList(String path) throws SQLException, IOException{
-		this.gridList = this.read(path);
-		//this.sectCount = this.gridList.size();
-	}
-
-
-
-
-
 	/*	public class GridList{
 		String mapID;
 		List<Grid> gridList;
@@ -135,6 +125,16 @@ public class roadgridList {
 		}		
 	}
 	 */
+
+
+	public roadgridList(String path) throws Exception, IOException {
+		// TODO Auto-generated constructor stub
+		this.gridList = this.read(path);
+	}
+
+
+
+
 
 	HashMap<String,RoadList> gridList =new HashMap<String,RoadList>();	
 	private HashMap<String, RoadList> read(String path) throws SQLException, IOException{
@@ -163,7 +163,7 @@ public class roadgridList {
 			//Fields Attributes
 			List<Object> fields = feature.getAttributes();
 
-			//int roadID = Integer.parseInt(feature.getAttribute("ID").toString());
+			int roadID = Integer.parseInt(feature.getAttribute("ID").toString());
 			//int roadWidth=Integer.parseInt(feature.getAttribute("WIDTH").toString());
 			String mapID=feature.getAttribute("MapID").toString();
 
@@ -178,14 +178,10 @@ public class roadgridList {
 
 				//RoadList roadList=new RoadList();
 				//roadList = new ArrayList<SimpleFeature>() ; //存放车辆Id的集合,也要把时间存者，以对每一辆车进行计算时间距离
-
 				//grid.mapId = mapID;
 
 
-
-
 				gridList.put(mapID,roadList);  //添加网格
-
 			}
 			else{
 				//Grid grid= getGridByID(mapID);	
@@ -195,34 +191,28 @@ public class roadgridList {
 				//System.out.println("count=\t"+roadList.cnt);
 			}
 
-
+			
 			/*String geoStr = feature.getDefaultGeometry().toString();			
 			MultiLineString linearRing= new MultiLineString(geoStr);
-
-			Sect sect;
-			ArrayList<Point> ps = new ArrayList<Point>();			
-
+			FieldListenerSpout.writeToFile("roadFeature",roadID+":");
 			for (int idx = 0; idx < linearRing.getLine(0).numPoints(); idx++) {
-				Point p = new Point(linearRing.getLine(0).getPoint(idx).x,linearRing.getLine(0).getPoint(idx).y);//,linearRing.getPoint(idx).y);
-				ps.add(p);
+				FieldListenerSpout.writeToFile("roadFeature", linearRing.getLine(0).getPoint(idx).x+","+linearRing.getLine(0).getPoint(idx).y+";");//,linearRing.getPoint(idx).y);
+				//Point p = new Point(linearRing.getLine(0).getPoint(idx).x,linearRing.getLine(0).getPoint(idx).y);//,linearRing.getPoint(idx).y);
+				//ps.add(p);
 			}
-			sect = new Sect(ps,roadID,roadWidth,mapID);
-			sectList.add(sect); */
+			FieldListenerSpout.writeToFile("roadFeature","\n" );*/
 
 		}  
 		itertor.close(); 
 
 		/*	    System.out.println("gridList= :");	    
 	    for(Map.Entry<String, RoadList> g : gridList.entrySet()){
-
-
 	    	System.out.print(g.getKey()+":\tsize="+g.getValue().size()+"\t");
 	    	int n= g.getValue().size();
 	    	for(int i=0;i<n;i++ ){
 	    		// for(ArrayList<SimpleFeature> road:g){
-
 	    		System.out.print(g.getValue().get(i).getAttribute("ID")  +"\t"  )  ;
-	    	}
+	      	}
 	    	System.out.println("\n");
 	    }*/
 
@@ -324,7 +314,7 @@ public class roadgridList {
 						//double distance=Polygon.DistancePointToLine(ps.get(i).x,ps.get(i).y,ps.get(i+1).x,ps.get(i+1).y,p.x,p.y);
 
 						if (distance<width) {  
-							System.out.printf("\ngridCount:%2d  roadCount:%5d  Less width,dist=%6.3f ",gridCount,roadCount,distance);
+							System.out.printf("\ngridCount:%2d  roadCount:%5d  LessWidth,dist=%7.3f ",gridCount,roadCount,distance);
 							return returnRoadID;
 						}
 						else if(distance<minD) {
@@ -333,7 +323,7 @@ public class roadgridList {
 							}
 					}
 				}
-				System.out.printf("\ngridCount:%2d  roadCount:%5d  Minimum dist=%6.3f ",gridCount,roadCount,minD);
+				System.out.printf("\ngridCount:%2d  roadCount:%5d  Minimum   dist=%7.3f ",gridCount,roadCount,minD);
 				if (minD<Math.sqrt(Math.pow(width,2)+ Math.pow(10,2) )) {  //sqrt(2) * width
 					
 					return lastMiniRoadID;
