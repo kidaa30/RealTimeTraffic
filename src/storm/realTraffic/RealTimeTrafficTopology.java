@@ -42,16 +42,16 @@ public class RealTimeTrafficTopology {
     	//builder.setSpout("spout", fieldListenerSpout,1);
     	builder.setSpout("spout", socketSpout,1);
     	builder.setBolt("RoadMatchingBolt", districtMacthingBolt,4).shuffleGrouping("spout");	        
-    	builder.setBolt("SpeedCalculatorBolt",spdBolt,2).fieldsGrouping("RoadMatchingBolt",new Fields("roadID")); 
+    	builder.setBolt("SpeedCalculatorBolt",spdBolt,1).fieldsGrouping("RoadMatchingBolt",new Fields("roadID")); 
     	builder.setBolt("DBwriter",dbWriter,1).shuffleGrouping("SpeedCalculatorBolt"); 
     	
     	Config conf = new Config();
     	if(args!=null && args.length > 0) {
     		conf.setNumWorkers(60);            
 
-    		LocalCluster  cluster= new LocalCluster();
-    		cluster.submitTopology(args[0], conf, builder.createTopology());
-    		//StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+    		//LocalCluster  cluster= new LocalCluster();
+    		//cluster.submitTopology(args[0], conf, builder.createTopology());
+    		StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
     	} 
         else {     
 
