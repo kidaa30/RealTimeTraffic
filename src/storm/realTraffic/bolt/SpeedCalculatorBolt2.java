@@ -25,6 +25,8 @@ import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+
 import java.util.List;
 
 import java.util.Timer;
@@ -156,6 +158,8 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Integer speed=Integer.parseInt(input.getValues().get(3).toString());
 		Date dateTime = null;
+		int averageSpeed=0;
+		int count=0;
 //		try {
 //			dateTime = sdf.parse(input.getValues().get(1).toString());
 //
@@ -177,8 +181,9 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 			
 			road.avgSpd=speed;
 			
-			Roads.add(road);  //添加路线
-			//return ;
+			Roads.add(road);  //添加路线			
+			averageSpeed=speed;
+			count=1;
 
 		}else{   //如果已经有该路线
 			
@@ -196,6 +201,8 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 					sum=sum+it;		
 				}				
 				road.avgSpd=(int)((double)sum/(double)road.roadSpd.size());
+				averageSpeed=road.avgSpd;
+				count=road.roadSpd.size();
 			}else{
 				System.out.print("RoadID3  ");
 			    double avgLast=getAvgById(RoadID);
@@ -217,18 +224,24 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 					road.count++;
 					road.roadSpd.add(speed);	
 					road.avgSpd=avgCurrent;
+					averageSpeed=avgCurrent;
+					count=road.roadSpd.size();
 					//System.out.println("\n\naverage speed:"+road.count+":"+road.avgSpd+"\n\n");
 				}
 			}	
 		}
-		if(mysql==null) mysql=new MySqlClass("172.20.36.247","3306","realTimeTraffic", "ghchen", "ghchen");
+		Date nowDate=new Date();
+		_collector.emit(new Values(nowDate,RoadID,averageSpeed,count));
+		
+		
+		/*if(mysql==null) mysql=new MySqlClass("172.20.36.247","3306","realTimeTraffic", "ghchen", "ghchen");
 		Date nowDate=new Date();
 		SimpleDateFormat sdf2= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		SimpleDateFormat sdf3= new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdf4= new SimpleDateFormat("yyyy-MM-dd-HH");
 		int min=nowDate.getMinutes();
 		int second=nowDate.getSeconds();
-		if( /*(min%2) ==0 && */(second==0) ){			
+		if( (second==0) ){			
 			
 			mysql.query("delete from realTimeTraffic.roadSpeed");
 			SpeedCalculatorBolt2.writeToMysql(mysql, Roads);
@@ -250,19 +263,7 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 				e.printStackTrace();
 			}
 
-		}
-
-//		timer=new Timer(true);
-//		TimerTask Job= new TimerTask() {		
-//			@Override
-//			public void run() {
-//				SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-//				String nowtime=sdf.format(new Date());
-//				CountBolt.writeToFile("vehicleList-"+nowtime,Roads);
-//			}
-//		};
-//		timer.schedule(Job,0, 60*1000);  //every 600 seconds.
-
+		}*/
 
 		_collector.ack(input);
 
@@ -282,7 +283,7 @@ public class SpeedCalculatorBolt2 implements IRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		// TODO Auto-generated method stub
-		declarer.declare(new Fields("Roads"));
+		declarer.declare(new Fields("nowDate","RoadID","averageSpeed","count"));
 	}
 
 

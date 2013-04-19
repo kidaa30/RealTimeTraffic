@@ -9,6 +9,7 @@ package storm.realTraffic;
  */
 
 //import storm.realTraffic.bolt.DBWriterBolt;
+import storm.realTraffic.bolt.DBWriter;
 import storm.realTraffic.bolt.MapMatchingBolt;
 import storm.realTraffic.bolt.SpeedCalculatorBolt;
 import storm.realTraffic.bolt.SpeedCalculatorBolt2;
@@ -32,17 +33,18 @@ public class RealTimeTrafficTopology {
                                                    {
     	// FieldListenerSpout fieldListenerSpout = new FieldListenerSpout();
     	SocketSpout socketSpout=new SocketSpout();
-
     	MapMatchingBolt districtMacthingBolt=new MapMatchingBolt(); 
     	//SpeedCalculatorBolt spdBolt =new SpeedCalculatorBolt();
     	SpeedCalculatorBolt2 spdBolt =new SpeedCalculatorBolt2();
-
+    	DBWriter dbWriter=new DBWriter();
     	TopologyBuilder builder = new TopologyBuilder();
 
     	//builder.setSpout("spout", fieldListenerSpout,1);
     	builder.setSpout("spout", socketSpout,1);
-    	builder.setBolt("RoadMatchingBolt", districtMacthingBolt,3).shuffleGrouping("spout");	        
-    	builder.setBolt("SpeedCalculatorBolt",spdBolt,1).fieldsGrouping("RoadMatchingBolt",new Fields("roadID")); 
+    	builder.setBolt("RoadMatchingBolt", districtMacthingBolt,4).shuffleGrouping("spout");	        
+    	builder.setBolt("SpeedCalculatorBolt",spdBolt,2).fieldsGrouping("RoadMatchingBolt",new Fields("roadID")); 
+    	builder.setBolt("DBwriter",dbWriter,1).shuffleGrouping("SpeedCalculatorBolt"); 
+    	
     	Config conf = new Config();
     	if(args!=null && args.length > 0) {
     		conf.setNumWorkers(60);            

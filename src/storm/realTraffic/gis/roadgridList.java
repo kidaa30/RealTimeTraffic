@@ -164,44 +164,40 @@ public class roadgridList {
 			List<Object> fields = feature.getAttributes();
 
 			int roadID = Integer.parseInt(feature.getAttribute("ID").toString());
-			//int roadWidth=Integer.parseInt(feature.getAttribute("WIDTH").toString());
-			String mapID=feature.getAttribute("MapID").toString();
-
-			if (!isExits(gridList, mapID)) {
-				//没有此小区，则新建一个小区，并存起来				
-				//System.out.println("gridListID:"+gridListID+"dateTime:"+dateTime+"viechId"+viechId);
-				//Grid grid = new Grid();
-
-				//ArrayList<SimpleFeature> roadList =new ArrayList<SimpleFeature>();
-				RoadList roadList=new RoadList();
-				roadList.add(feature);
-
-				//RoadList roadList=new RoadList();
-				//roadList = new ArrayList<SimpleFeature>() ; //存放车辆Id的集合,也要把时间存者，以对每一辆车进行计算时间距离
-				//grid.mapId = mapID;
-
-
-				gridList.put(mapID,roadList);  //添加网格
-			}
-			else{
-				//Grid grid= getGridByID(mapID);	
-				RoadList roadList=getGridByID(mapID);
-				roadList.add(feature); 		
-				//roadList.cnt++;
-				//System.out.println("count=\t"+roadList.cnt);
-			}
-
-			
-			/*String geoStr = feature.getDefaultGeometry().toString();			
+			//int roadWidth=Integer.parseInt(feature.getAttribute("WIDTH").toString());			
+		
+			String geoStr = feature.getDefaultGeometry().toString();			
 			MultiLineString linearRing= new MultiLineString(geoStr);
-			FieldListenerSpout.writeToFile("roadFeature",roadID+":");
+			
+			/*FieldListenerSpout.writeToFile("roadFeature",roadID+","+roadWidth+":");
 			for (int idx = 0; idx < linearRing.getLine(0).numPoints(); idx++) {
 				FieldListenerSpout.writeToFile("roadFeature", linearRing.getLine(0).getPoint(idx).x+","+linearRing.getLine(0).getPoint(idx).y+";");//,linearRing.getPoint(idx).y);
 				//Point p = new Point(linearRing.getLine(0).getPoint(idx).x,linearRing.getLine(0).getPoint(idx).y);//,linearRing.getPoint(idx).y);
 				//ps.add(p);
 			}
 			FieldListenerSpout.writeToFile("roadFeature","\n" );*/
-
+			
+			//String mapID=feature.getAttribute("MapID").toString();
+			
+			String mapID;
+			if(feature.getAttributes().contains("MapID"))
+				mapID=feature.getAttribute("MapID").toString();
+			else{
+				int len=linearRing.getLine(0).numPoints();
+				Double centerX= (linearRing.getLine(0).getPoint(0).x+linearRing.getLine(0).getPoint(len-1).x)/2*10;
+				Double centerY= (linearRing.getLine(0).getPoint(0).y+linearRing.getLine(0).getPoint(len-1).y)/2*10;
+				mapID=   (centerY.toString()).substring(0, 3)+"_"+ (centerX.toString()).substring(0, 4);
+			}
+			
+			if (!isExits(gridList, mapID)) {
+				RoadList roadList=new RoadList();
+				roadList.add(feature);
+				gridList.put(mapID,roadList);  //添加网格
+			}
+			else{
+				RoadList roadList=getGridByID(mapID);
+				roadList.add(feature); 		
+			}
 		}  
 		itertor.close(); 
 
