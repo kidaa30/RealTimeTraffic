@@ -98,68 +98,6 @@ public class FieldListenerSpout implements IRichSpout {
            } catch (IOException ex) {System.out.println(ex); } 
     
 
-    	/*int count=0;
-    	int ch=0;
-    	int err=0;
-    	try {
-    		if(sock==null){
-    			sock=new Socket("172.20.14.204",15025);}
-    		while(true){
-				byte[] b3= new byte[3];
-				if(sock!=null ){
-					try{
-						sock.getInputStream().read(b3,0,3);
-						ch=b3[0];
-					}catch ( Exception e){
-						System.out.println("connection reset, reconnecting ...");
-						sock.close();
-						Thread.sleep(100);
-						sock=new Socket("172.20.14.204",15025);						
-					}
-
-				}else{
-					sock=new Socket("172.20.14.204",15025);	
-					break ;
-				}
-    			int len=SocketJava.bytesToShort(b3, 1);
-    			if(len<0) break;
-    			byte[] bytelen= new byte[len];
-    			sock.getInputStream().read(bytelen);
-    			if(bytelen==null){
-    				System.out.println("read the second part from byte from socket failed ! ");
-    				break;
-    			}
-    			sock.getInputStream().markSupported();
-    			sock.getInputStream().mark(3);
-
-    			String gpsString=SocketJava.DissectOneMessage(ch,bytelen);
-    			//System.out.println("GPSstring="+gpsString);
-    			String[] GPSRecord=null;
-    			if(gpsString!=null){
-    				GPSRecord =gpsString.split(TupleInfo.getDelimiter());
-    				//					for(int i=0;i<GPSRecord.length-1;i++)
-    				//					writeToFile("/home/ghchen/gpsRecord",GPSRecord[i]+",");
-    				//					writeToFile("/home/ghchen/gpsRecord","\n");					
-
-    				_collector.emit(new Values(GPSRecord[0],GPSRecord[3],GPSRecord[7],GPSRecord[5],
-    						GPSRecord[6] , GPSRecord[2],GPSRecord[1])); 
-    				//}
-
-    			}else{
-    				break;
-    			}
-
-    		}	
-    	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	} catch (Exception e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	}	*/
-
-
-
     }        
 
     public void ack(Object id) {
