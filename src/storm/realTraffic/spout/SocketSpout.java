@@ -55,7 +55,7 @@ public class SocketSpout implements IRichSpout {
 //    		if(sock==null){
 //    			sock=new Socket("xxx.20.14.204",15025);	}
     		if(sock==null){
-    			sock=new Socket("xxx.75.252.138",5557);	
+    			sock=new Socket("xxx.xxx.xxx.138",5557);	
     			  output = sock.getOutputStream();	
     			  output.write(encryptText.getBytes());
     			  output.flush();
@@ -70,14 +70,14 @@ public class SocketSpout implements IRichSpout {
 						System.out.println("connection reset, reconnecting ...");
 						sock.close();
 						Thread.sleep(10000);
-						sock=new Socket("xxx.75.252.138",5557);
+						sock=new Socket("xxx.xxx.xxx.138",5557);
 		    			  output = sock.getOutputStream();	
 		    			  output.write(encryptText.getBytes());
 		    			  output.flush();
 					}
 
 				}else{
-					sock=new Socket("xxx.75.252.138",5557);	
+					sock=new Socket("xxx.xxx.xxx.138",5557);	
 	    			  output = sock.getOutputStream();	
 	    			  output.write(encryptText.getBytes());
 	    			  output.flush();
