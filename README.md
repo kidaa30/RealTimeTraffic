@@ -11,9 +11,9 @@ the traffic condition updates every 30 seconds.
 To Deploy:
 ====
 
-(1) you need a powerfull storm cluster, storm.apache.org;
+(1) you need a powerfull storm cluste: http://storm.apache.org;
 
-(2) you need a whole city GIS(geographic information system) road databaes or .shp files;
+(2) you need a whole city GIS(geographic information system) road databaes or   ArcGIS .shp files;
 
 (3) you need to download open sourced geoTools .jar file and put in  folder storm/lib.
 
