@@ -1,4 +1,4 @@
-RealTimeTraffic
+function:
 ===============
 
 A real time road traffic condition(congestion or not) ananlysis system with realtime mass GPS data collected from Taxis and buses based on Twitter storm stream computing framwork.
