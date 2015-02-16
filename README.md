@@ -15,7 +15,7 @@ To Deploy:
 
 (2) you need a whole city GIS(geographic information system) road databaes or   ArcGIS .shp files;
 
-(3) you need to download open sourced geoTools .jar file and put in  folder storm/lib.
+(3) you need to download open sourced geoTools .jar file (http://www.geotools.org/) and put in  folder storm/lib.
 
 Submit Storm topology:
 ====
