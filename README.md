@@ -5,7 +5,7 @@ A real time road traffic condition(congestion or not) ananlysis system with real
 
 A demo of this system, please visit : http://210.75.252.140:8080/infoL/sslk_weibo.html
 
-the traffic condition updates 30 seconds.
+the traffic condition updates every 30 seconds.
 
 
 To Deploy:
