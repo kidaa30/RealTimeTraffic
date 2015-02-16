@@ -16,6 +16,7 @@ To Deploy:
 (3) you need to download open sourced geoTools .jar file and put in  folder storm/lib.
 
 Submit Storm topology:
-storm jar real-time-traf-0.0.1-SNAPSHOT.jar  
+====
+storm jar real-time-traf-0.0.1-SNAPSHOT.jar  realTraffic.RealTimeTrafficTopology  realtimeTraffic
 
  
