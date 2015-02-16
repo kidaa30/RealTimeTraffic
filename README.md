@@ -1,9 +1,11 @@
 function:
 ===============
 
-A real time road traffic condition(congestion or not) ananlysis system with realtime mass GPS data collected from Taxis and buses based on Twitter storm stream computing framwork.
+A real time road traffic condition(congestion or not) ananlysis system with realtime mass GPS data collected from Taxis and buses based on Twitter storm stream computing framwork. 
 
 A demo of this system, please visit : http://210.75.252.140:8080/infoL/sslk_weibo.html
+
+the traffic condition updates 30 seconds.
 
 
 To Deploy:
